@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Mapping Stage</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+            color: #333;
+        }
+
+        .selection-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+
+        .selection-container label {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .selection-container select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+
+        .frames-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .frame {
+            width: 48%;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .frame h3 {
+            font-size: 22px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        li {
+            margin: 15px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 6px 12px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        input[type="number"] {
+            padding: 8px;
+            font-size: 16px;
+            width: 80px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+
+        .action-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .action-container button {
+            background-color: #007BFF;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .action-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Exam Question Mapping</h1>
+
+        <!-- Exam and Question Set Selection -->
+        <div class="selection-container">
+            <div>
+                <label for="exam-name">Select Exam:</label>
+                <select id="exam-name">
+                    <option value="exam1">Exam 1</option>
+                    <option value="exam2">Exam 2</option>
+                    <option value="exam3">Exam 3</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="question-set">Select Question Set:</label>
+                <select id="question-set">
+                    <option value="set1">Set 1</option>
+                    <option value="set2">Set 2</option>
+                    <option value="set3">Set 3</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Frames for Questions -->
+        <div class="frames-container">
+            <!-- Left Frame -->
+            <div class="frame" id="left-frame">
+                <h3>Available Questions</h3>
+                <ul id="available-questions">
+                    <li>Question A <button onclick="selectQuestion('A')">Select</button></li>
+                    <li>Question B <button onclick="selectQuestion('B')">Select</button></li>
+                    <li>Question C <button onclick="selectQuestion('C')">Select</button></li>
+                    <li>Question D <button onclick="selectQuestion('D')">Select</button></li>
+                </ul>
+            </div>
+
+            <!-- Right Frame -->
+            <div class="frame" id="right-frame">
+                <h3>Selected Questions</h3>
+                <div class="action-container">
+                    <p>Enter Number of Questions for Exam:</p>
+                    <input type="number" id="num-questions" placeholder="Number of Questions" min="1">
+                    <button onclick="autoSelectQuestions()">Auto Select</button>
+                </div>
+                <ul id="selected-questions"></ul>
+                <div class="error-message" id="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedQuestionsCount = 0;
+
+        // Select a question and move it to the right frame
+        function selectQuestion(question) {
+            const numQuestions = parseInt(document.getElementById('num-questions').value);
+            if (selectedQuestionsCount >= numQuestions) {
+                showError("You cannot select more questions than the specified limit.");
+                return;
+            }
+            const selectedQuestionsList = document.getElementById('selected-questions');
+            const newQuestion = document.createElement('li');
+            newQuestion.textContent = `Question ${question}`;
+
+            selectedQuestionsList.appendChild(newQuestion);
+            selectedQuestionsCount++;
+        }
+
+        // Auto-select random questions based on the number entered
+        function autoSelectQuestions() {
+            const numQuestions = parseInt(document.getElementById('num-questions').value);
+            const availableQuestions = ['A', 'B', 'C', 'D'];
+            const selectedQuestionsList = document.getElementById('selected-questions');
+            selectedQuestionsList.innerHTML = ''; // Clear previous selections
+            selectedQuestionsCount = 0;
+
+            if (isNaN(numQuestions) || numQuestions <= 0) {
+                showError("Please enter a valid number of questions.");
+                return;
+            }
+
+            // Randomly select the required number of questions
+            for (let i = 0; i < numQuestions; i++) {
+                if (availableQuestions.length === 0) {
+                    break;
+                }
+                const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                const question = availableQuestions[randomIndex];
+                availableQuestions.splice(randomIndex, 1); // Remove selected question
+
+                const newQuestion = document.createElement('li');
+                newQuestion.textContent = `Question ${question}`;
+                selectedQuestionsList.appendChild(newQuestion);
+                selectedQuestionsCount++;
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = message;
+        }
+    </script>
+</body>
+</html>

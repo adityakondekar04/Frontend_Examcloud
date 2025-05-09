@@ -1,0 +1,171 @@
+body {
+  background: #f4f6fb;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.centered-card {
+  background: #fff;
+  padding: 2rem 1.5rem;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(60,72,88,0.12);
+  width: 100%;
+  max-width: 420px;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #3a3a3a;
+  font-weight: 600;
+}
+
+h1 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+h2 {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+form#centerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+label {
+  color: #444;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+input[type="number"], input[type="datetime-local"], select {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #f9fafb;
+  transition: border 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #7c3aed;
+  outline: none;
+  background: #fff;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.7rem;
+}
+
+button {
+  flex: 1;
+  padding: 0.7rem 0;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+#addCenterBtn {
+  background: #f3f4f6;
+  color: #7c3aed;
+  border: 1px solid #e5e7eb;
+}
+
+#addCenterBtn:hover {
+  background: #ede9fe;
+}
+
+.proceed-btn {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.proceed-btn:hover {
+  background: #5b21b6;
+}
+
+#selectedCentersSection {
+  margin-top: 1.5rem;
+}
+
+#selectedCentersList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+#selectedCentersList li {
+  background: #f6f5ff;
+  color: #3a3a3a;
+  border-radius: 10px;
+  padding: 0.9rem 1rem 0.7rem 1rem;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  position: relative;
+}
+
+#selectedCentersList li strong {
+  font-size: 1.08em;
+  color: #5b21b6;
+}
+
+#selectedCentersList li span {
+  font-size: 0.97em;
+  color: #444;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  background: none;
+  border: none;
+  color: #b91c1c;
+  font-size: 0.98em;
+  cursor: pointer;
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.remove-btn:hover {
+  background: #fee2e2;
+}
+
+@media (max-width: 500px) {
+  .centered-card {
+    padding: 1rem 0.3rem;
+    max-width: 99vw;
+  }
+  h1 {
+    font-size: 1.1rem;
+  }
+  #selectedCentersList li {
+    padding: 0.7rem 0.5rem 0.6rem 0.5rem;
+  }
+} 

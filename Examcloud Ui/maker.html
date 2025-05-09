@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exam Creator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #eef1f5;
+      padding: 40px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+    }
+
+    .question-header {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .nav-buttons {
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Exam Question Creator</h2>
+
+    <!-- Step 1: Choose Action -->
+    <div id="step1" class="step active">
+      <button onclick="chooseAction('new')">Create New Set</button>
+      <button onclick="chooseAction('existing')">Add to Existing Set</button>
+    </div>
+
+    <!-- Step 2: Enter Set Info -->
+    <div id="step2" class="step">
+      <input type="text" id="setName" placeholder="Enter Question Set Name">
+      <input type="number" id="setCount" placeholder="Enter Number of Questions">
+      <div class="nav-buttons">
+        <button class="btn-secondary" onclick="goToStep(1)">Back</button>
+        <button onclick="startQuestionEntry()">Next</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Enter Questions One by One -->
+    <div id="step3" class="step">
+      <div id="questionFormArea"></div>
+      <div class="nav-buttons">
+        <button class="btn-secondary" onclick="prevQuestion()">Previous</button>
+        <button onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    let totalQuestions = 0;
+    let currentQuestion = 0;
+    let questionData = [];
+
+    function goToStep(step) {
+      currentStep = step;
+      document.querySelectorAll('.step').forEach((s, i) => {
+        s.classList.toggle('active', i === step - 1);
+      });
+    }
+
+    function chooseAction(action) {
+      if (action === 'new') goToStep(2);
+      else alert("Add to existing not implemented in this demo.");
+    }
+
+    function startQuestionEntry() {
+      const name = document.getElementById('setName').value.trim();
+      const count = parseInt(document.getElementById('setCount').value);
+
+      if (!name || !count || count <= 0) {
+        alert("Please enter valid set name and number of questions.");
+        return;
+      }
+
+      totalQuestions = count;
+      questionData = Array.from({ length: count }, () => ({
+        question: "", options: ["", "", "", ""], correct: ""
+      }));
+
+      currentQuestion = 0;
+      renderQuestionForm();
+      goToStep(3);
+    }
+
+    function renderQuestionForm() {
+      const formArea = document.getElementById('questionFormArea');
+      const q = questionData[currentQuestion];
+
+      formArea.innerHTML = `
+        <div class="question-header">Question ${currentQuestion + 1} of ${totalQuestions}</div>
+        <textarea id="qText" placeholder="Enter question" rows="2">${q.question}</textarea>
+        <input type="text" id="optA" placeholder="Option A" value="${q.options[0]}">
+        <input type="text" id="optB" placeholder="Option B" value="${q.options[1]}">
+        <input type="text" id="optC" placeholder="Option C" value="${q.options[2]}">
+        <input type="text" id="optD" placeholder="Option D" value="${q.options[3]}">
+        <input type="text" id="correctAns" placeholder="Correct Answer (A/B/C/D)" value="${q.correct}">
+      `;
+    }
+
+    function saveCurrentQuestion() {
+      const q = {
+        question: document.getElementById('qText').value,
+        options: [
+          document.getElementById('optA').value,
+          document.getElementById('optB').value,
+          document.getElementById('optC').value,
+          document.getElementById('optD').value
+        ],
+        correct: document.getElementById('correctAns').value
+      };
+      questionData[currentQuestion] = q;
+    }
+
+    function nextQuestion() {
+      saveCurrentQuestion();
+      if (currentQuestion < totalQuestions - 1) {
+        currentQuestion++;
+        renderQuestionForm();
+      } else {
+        alert("All questions completed! You can now save to backend or export.");
+        console.log("Final Data:", questionData);
+      }
+    }
+
+    function prevQuestion() {
+      saveCurrentQuestion();
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestionForm();
+      }
+    }
+  </script>
+</body>
+</html>

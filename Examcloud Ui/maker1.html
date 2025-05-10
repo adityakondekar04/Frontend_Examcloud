@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Question Creator</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --secondary-color: #f8f9fa;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --error-color: #dc3545;
+            --success-color: #28a745;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .setup-form, .question-form, .exam-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button.secondary {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        button.secondary:hover {
+            background-color: #e9ecef;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .progress-indicator {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .correct-answer-group {
+            margin-top: 10px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+        }
+        
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .checkbox-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .note {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MCQ Exam Creator</h1>
+        
+        <!-- Step 1: Setup Form -->
+        <div id="setup-form" class="setup-form">
+            <div class="section-title">Create Exam</div>
+            
+            <!-- Exam details section -->
+            <div class="form-group">
+                <label for="exam-title">Exam Title</label>
+                <input type="text" id="exam-title" placeholder="Enter exam title" required>
+                <div id="exam-title-error" class="error-message"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="section">Select Section</label>
+                <select id="section" required>
+                    <option value="">Select a section</option>
+                    <option value="Math">Math</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="English">English</option>
+                    <option value="History">History</option>
+                    <option value="Geography">Geography</option>
+                </select>
+                <div id="section-error" class="error-message"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="exam-duration">Exam Duration (minutes)</label>
+                <input type="number" id="exam-duration" min="5" max="240" value="60" required>
+                <div id="exam-duration-error" class="error-message"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="question-count">Number of Questions</label>
+                <input type="number" id="question-count" min="1" max="50" value="5" required>
+                <div id="question-count-error" class="error-message"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="exam-instructions">Exam Instructions</label>
+                <textarea id="exam-instructions" placeholder="Enter exam instructions..."></textarea>
+            </div>
+            
+            <button id="create-button"> Create exam </button>
+        </div>
+        
+        <!-- Step 2: Question Form -->
+        <div id="question-form" class="question-form" style="display: none;">
+            <div class="progress-indicator">
+                Question <span id="current-question">1</span> of <span id="total-questions">5</span>
+            </div>
+            
+            <div class="progress-bar">
+                <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="question-text">Question Text</label>
+                <textarea id="question-text" placeholder="Enter your question here..." required></textarea>
+                <div id="question-text-error" class="error-message"></div>
+            </div>
+            
+            <div class="options-container">
+                <div class="form-group">
+                    <label for="option-a">Option A</label>
+                    <input type="text" id="option-a" placeholder="Enter option A" required>
+                    <div id="option-a-error" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="option-b">Option B</label>
+                    <input type="text" id="option-b" placeholder="Enter option B" required>
+                    <div id="option-b-error" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="option-c">Option C</label>
+                    <input type="text" id="option-c" placeholder="Enter option C" required>
+                    <div id="option-c-error" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="option-d">Option D</label>
+                    <input type="text" id="option-d" placeholder="Enter option D" required>
+                    <div id="option-d-error" class="error-message"></div>
+                </div>
+            </div>
+            
+            <div class="form-group correct-answer-group">
+                <label>Correct Answer(s)</label>
+                <div class="note">Check all correct options. At least one answer must be selected.</div>
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="correct-a" name="correct-answer" value="A" checked>
+                        <label for="correct-a">A</label>
+                    </div>
+                    
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="correct-b" name="correct-answer" value="B">
+                        <label for="correct-b">B</label>
+                    </div>
+                    
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="correct-c" name="correct-answer" value="C">
+                        <label for="correct-c">C</label>
+                    </div>
+                    
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="correct-d" name="correct-answer" value="D">
+                        <label for="correct-d">D</label>
+                    </div>
+                </div>
+                <div id="correct-answer-error" class="error-message"></div>
+            </div>
+            
+            <div class="button-group">
+                <button id="prev-button" class="secondary" disabled>Previous</button>
+                <button id="next-button">Next</button>
+                <button id="submit-button" style="display: none;">Submit Exam</button>
+            </div>
+        </div>
+        
+        <!-- Confirmation Modal -->
+        <div id="confirmation-modal" class="modal">
+            <div class="modal-content">
+                <h2>Confirm Submission</h2>
+                <p>Are you sure you want to submit this exam?</p>
+                <div class="modal-buttons">
+                    <button id="cancel-submit" class="secondary">Cancel</button>
+                    <button id="confirm-submit">Submit</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Success Modal -->
+        <div id="success-modal" class="modal">
+            <div class="modal-content">
+                <h2>Success!</h2>
+                <p id="success-message">Your exam has been created successfully.</p>
+                <div class="modal-buttons">
+                    <button id="create-new" class="secondary">Create New Exam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        const state = {
+            section: '',
+            totalQuestions: 5,
+            currentQuestionIndex: 0,
+            questions: [],
+            examTitle: '',
+            examDuration: 60,
+            examInstructions: ''
+        };
+
+        // DOM Elements
+        const setupForm = document.getElementById('setup-form');
+        const questionForm = document.getElementById('question-form');
+        const create = document.getElementById('create-button');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const submitButton = document.getElementById('submit-button');
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const successModal = document.getElementById('success-modal');
+        const cancelSubmit = document.getElementById('cancel-submit');
+        const confirmSubmit = document.getElementById('confirm-submit');
+        const createNew = document.getElementById('create-new');
+
+        // Initialize empty questions when starting
+        function initializeQuestions(count) {
+            state.questions = [];
+            for (let i = 0; i < count; i++) {
+                state.questions.push({
+                    questionText: '',
+                    options: {
+                        A: '',
+                        B: '',
+                        C: '',
+                        D: ''
+                    },
+                    correctAnswers: ['A'] // Default to A being selected
+                });
+            }
+        }
+
+        // Start adding questions
+        create.addEventListener('click', () => {
+            const examTitle = document.getElementById('exam-title').value;
+            const section = document.getElementById('section').value;
+            const examDuration = parseInt(document.getElementById('exam-duration').value);
+            const questionCount = parseInt(document.getElementById('question-count').value);
+            let hasError = false;
+            
+            // Validate exam title
+            if (!examTitle.trim()) {
+                document.getElementById('exam-title-error').textContent = 'Please enter an exam title';
+                hasError = true;
+            } else {
+                document.getElementById('exam-title-error').textContent = '';
+            }
+            
+            // Validate section
+            if (!section) {
+                document.getElementById('section-error').textContent = 'Please select a section';
+                hasError = true;
+            } else {
+                document.getElementById('section-error').textContent = '';
+            }
+            
+            // Validate exam duration
+            if (!examDuration || examDuration < 5 || examDuration > 240) {
+                document.getElementById('exam-duration-error').textContent = 'Please enter a duration between 5 and 240 minutes';
+                hasError = true;
+            } else {
+                document.getElementById('exam-duration-error').textContent = '';
+            }
+            
+            // Validate question count
+            if (!questionCount || questionCount < 1 || questionCount > 50) {
+                document.getElementById('question-count-error').textContent = 'Please enter a number between 1 and 50';
+                hasError = true;
+            } else {
+                document.getElementById('question-count-error').textContent = '';
+            }
+            
+            if (hasError) return;
+            
+            // Set state
+            state.examTitle = examTitle;
+            state.section = section;
+            state.examDuration = examDuration;
+            state.totalQuestions = questionCount;
+            state.currentQuestionIndex = 0;
+            state.examInstructions = document.getElementById('exam-instructions').value;
+            
+            // Initialize questions
+            initializeQuestions(questionCount);
+            
+            // Update UI
+            document.getElementById('total-questions').textContent = questionCount;
+            document.getElementById('current-question').textContent = '1';
+            document.getElementById('progress-bar-fill').style.width = `${(1 / questionCount) * 100}%`;
+            
+            // Hide setup form, show question form
+            setupForm.style.display = 'none';
+            questionForm.style.display = 'block';
+            
+            // Load first question (empty)
+            loadQuestion(0);
+        });
+
+        // Load question data into the form
+        function loadQuestion(index) {
+            const question = state.questions[index];
+            
+            document.getElementById('question-text').value = question.questionText;
+            document.getElementById('option-a').value = question.options.A;
+            document.getElementById('option-b').value = question.options.B;
+            document.getElementById('option-c').value = question.options.C;
+            document.getElementById('option-d').value = question.options.D;
+            
+            // Set correct answer checkboxes
+            const options = ['A', 'B', 'C', 'D'];
+            options.forEach(option => {
+                document.getElementById(`correct-${option.toLowerCase()}`).checked = 
+                    question.correctAnswers.includes(option);
+            });
+            
+            // Update navigation buttons
+            prevButton.disabled = index === 0;
+            
+            if (index === state.totalQuestions - 1) {
+                nextButton.style.display = 'none';
+                submitButton.style.display = 'block';
+            } else {
+                nextButton.style.display = 'block';
+                submitButton.style.display = 'none';
+            }
+            
+            // Update progress indicator
+            document.getElementById('current-question').textContent = index + 1;
+            document.getElementById('progress-bar-fill').style.width = `${((index + 1) / state.totalQuestions) * 100}%`;
+            
+            // Clear error messages
+            clearErrorMessages();
+        }
+
+        // Save current question data
+        function saveCurrentQuestion() {
+            const index = state.currentQuestionIndex;
+            const question = state.questions[index];
+            
+            question.questionText = document.getElementById('question-text').value;
+            question.options.A = document.getElementById('option-a').value;
+            question.options.B = document.getElementById('option-b').value;
+            question.options.C = document.getElementById('option-c').value;
+            question.options.D = document.getElementById('option-d').value;
+            
+            // Get all checked correct answers
+            const correctAnswers = [];
+            const options = ['A', 'B', 'C', 'D'];
+            options.forEach(option => {
+                if (document.getElementById(`correct-${option.toLowerCase()}`).checked) {
+                    correctAnswers.push(option);
+                }
+            });
+            
+            question.correctAnswers = correctAnswers;
+            state.questions[index] = question;
+        }
+
+        // Validate current question
+        function validateCurrentQuestion() {
+            let isValid = true;
+            
+            // Validate question text
+            if (!document.getElementById('question-text').value.trim()) {
+                document.getElementById('question-text-error').textContent = 'Please enter the question text';
+                isValid = false;
+            } else {
+                document.getElementById('question-text-error').textContent = '';
+            }
+            
+            // Validate options
+            const options = ['a', 'b', 'c', 'd'];
+            options.forEach(option => {
+                if (!document.getElementById(`option-${option}`).value.trim()) {
+                    document.getElementById(`option-${option}-error`).textContent = `Please enter option ${option.toUpperCase()}`;
+                    isValid = false;
+                } else {
+                    document.getElementById(`option-${option}-error`).textContent = '';
+                }
+            });
+            
+            // Validate at least one correct answer is selected
+            const correctCheckboxes = document.querySelectorAll('input[name="correct-answer"]:checked');
+            if (correctCheckboxes.length === 0) {
+                document.getElementById('correct-answer-error').textContent = 'Please select at least one correct answer';
+                isValid = false;
+            } else {
+                document.getElementById('correct-answer-error').textContent = '';
+            }
+            
+            return isValid;
+        }
+
+        // Clear all error messages
+        function clearErrorMessages() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(element => {
+                element.textContent = '';
+            });
+        }
+
+        // Handle next button click
+        nextButton.addEventListener('click', () => {
+            // Validate current question
+            if (!validateCurrentQuestion()) return;
+            
+            // Save current question
+            saveCurrentQuestion();
+            
+            // Move to next question
+            state.currentQuestionIndex++;
+            loadQuestion(state.currentQuestionIndex);
+        });
+
+        // Handle previous button click
+        prevButton.addEventListener('click', () => {
+            // Save current question without validation
+            saveCurrentQuestion();
+            
+            // Move to previous question
+            state.currentQuestionIndex--;
+            loadQuestion(state.currentQuestionIndex);
+        });
+
+        // Handle submit button click
+        submitButton.addEventListener('click', () => {
+            // Validate current question
+            if (!validateCurrentQuestion()) return;
+            
+            // Save current question
+            saveCurrentQuestion();
+            
+            // Show confirmation modal
+            confirmationModal.style.display = 'flex';
+        });
+
+        // Handle cancel submit
+        cancelSubmit.addEventListener('click', () => {
+            confirmationModal.style.display = 'none';
+        });
+
+        // Handle confirm submit
+        confirmSubmit.addEventListener('click', () => {
+            confirmationModal.style.display = 'none';
+            
+            // Prepare data for submission
+            const submissionData = {
+                examTitle: state.examTitle,
+                section: state.section,
+                examDuration: state.examDuration,
+                examInstructions: state.examInstructions,
+                questions: state.questions
+            };
+            
+            // Log the data (for demonstration)
+            console.log('Submitting exam:', submissionData);
+            
+            // Send data to backend
+            fetch('/api/maker', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(submissionData)
+            })
+            .then(response => {
+                // Show success modal (in real app, check response first)
+                successModal.style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('Error submitting exam:', error);
+                // In a real app, show error message to user
+                alert('There was an error creating your exam. Please try again.');
+            });
+        });
+
+        // Handle create new button
+        createNew.addEventListener('click', () => {
+            successModal.style.display = 'none';
+            questionForm.style.display = 'none';
+            setupForm.style.display = 'flex';
+            
+            // Reset form values
+            document.getElementById('exam-title').value = '';
+            document.getElementById('section').value = '';
+            document.getElementById('exam-duration').value = '60';
+            document.getElementById('question-count').value = '5';
+            document.getElementById('exam-instructions').value = '';
+        });
+    </script>
+</body>
+</html>

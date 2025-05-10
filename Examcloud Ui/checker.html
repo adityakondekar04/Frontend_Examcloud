@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Paper Checker Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #00A3E0;
+            --secondary-color: #0056B3;
+            --success-color: #4CAF50;
+            --warning-color: red;
+            --error-color: #FF4757;
+            --background-color: #f5f6fa;
+        }
+
+        body {
+            background-color: var(--background-color);
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+
+        .header {
+            background:var(--primary-color) ;
+            color: rgb(252, 251, 251);
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .header .section-title {
+         font-weight: bold;
+         font-size: 1.3rem; 
+        }
+        
+        .section-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .section-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            background: white;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .section-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .question-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .analysis-panel {
+            width: 300px;
+            flex-shrink: 0;
+        }
+
+        .question-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-list {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .correct-answer {
+            background-color: #e8f5e9;
+            border: 2px solid var(--success-color);
+        }
+
+        .correct-tick {
+            color: var(--success-color);
+            margin-left: auto;
+            font-weight: bold;
+        }
+
+        .multiple-correct {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .status-indicator {
+            margin: 1rem 0;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .verified-correct {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .needs-correction {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .pending-review {
+            background-color: #e0e0e0;
+            color: #616161;
+        }
+
+        .approval-section {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .approval-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .approval-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .remark-box {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-height: 100px;
+            resize: none;
+            box-sizing: border-box;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1.1rem;
+            border: none;
+            border-radius: 6px;
+            background: var(--secondary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .question-analysis {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .grid-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            background: var(--background-color);
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .question-btn {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            background: white;
+            color: #333;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .question-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .question-btn.approved {
+            background: var(--success-color);
+            color: white;
+            border: none;
+        }
+
+        .question-btn.rejected {
+            background: var(--warning-color);
+            color: white;
+            border: none;
+        }
+
+        .question-btn.pending {
+            background: #e0e0e0;
+            color: #616161;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .legend-item {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .summary {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .summary h3 {
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #333;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .analysis-panel {
+                width: 100%;
+            }
+            
+            .question-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .approval-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Question Paper Checker</h2>
+    </div>
+
+    <div class="section-nav">
+        <button class="section-btn active" onclick="switchSection('A')">SECTION A</button>
+        <button class="section-btn" onclick="switchSection('B')">SECTION B</button>
+    </div>
+
+    <div class="header">
+        <div class="section-title">SECTION A</div>
+    </div>
+
+    <div class="main-content">
+        <div class="question-panel">
+            <div class="question-container" id="questionPanel">
+                <div class="question-text" id="questionText"></div>
+                <div class="status-indicator pending-review" id="statusIndicator">Pending Review</div>
+                <div class="options-list" id="optionsList"></div>
+                <div class="approval-section">
+                    <div class="approval-options">
+                        <label class="approval-option">
+                            <input type="radio" name="approval" value="approved" id="approvedRadio">
+                            <span>Approve Question</span>
+                        </label>
+                        <label class="approval-option">
+                            <input type="radio" name="approval" value="rejected" id="rejectedRadio">
+                            <span>Reject Question</span>
+                        </label>
+                    </div>
+                    <textarea class="remark-box" id="remarkBox" placeholder="Enter correction remarks (required if rejected)" style="display: none;"></textarea>
+                </div>
+            </div>
+
+            <div class="navigation-buttons">
+                <button class="nav-btn" onclick="previousQuestion()">Previous</button>
+                <button class="nav-btn" onclick="nextQuestion()" id="nextButton">Next Question</button>
+            </div>
+        </div>
+
+        <div class="analysis-panel">
+            <div class="question-analysis">
+                <div class="section-header">SECTION A</div>
+                <div class="grid-container">
+                    <div class="question-grid" id="questionGrid"></div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color verified-correct"></div>
+                        <span>Approved</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color needs-correction"></div>
+                        <span>Rejected</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color pending-review"></div>
+                        <span>Pending</span>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <h3>Review Summary</h3>
+                    <div class="summary-item">
+                        <span>Approved</span>
+                        <span id="approvedCount">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Rejected</span>
+                        <span id="rejectedCount">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Pending</span>
+                        <span id="pendingCount">30</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Complete question data with 30 questions (15 per section)
+        const sectionData = {
+            'A': {
+                questions: [
+                    {
+                        text: "Q1. What is the capital of France?",
+                        options: [
+                            {text: "London", correct: false},
+                            {text: "Paris", correct: true},
+                            {text: "Berlin", correct: false},
+                            {text: "Madrid", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q2. Which numbers are prime? (Select all that apply)",
+                        options: [
+                            {text: "2", correct: true},
+                            {text: "4", correct: false},
+                            {text: "7", correct: true},
+                            {text: "9", correct: false}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q3. What is the chemical symbol for Gold?",
+                        options: [
+                            {text: "Go", correct: false},
+                            {text: "Au", correct: true},
+                            {text: "Ag", correct: false},
+                            {text: "Gd", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q4. Which of these are programming languages? (Select all that apply)",
+                        options: [
+                            {text: "Java", correct: true},
+                            {text: "HTML", correct: false},
+                            {text: "Python", correct: true},
+                            {text: "CSS", correct: false}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q5. Who painted the Mona Lisa?",
+                        options: [
+                            {text: "Vincent van Gogh", correct: false},
+                            {text: "Pablo Picasso", correct: false},
+                            {text: "Leonardo da Vinci", correct: true},
+                            {text: "Michelangelo", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q6. Which planets are gas giants? (Select all that apply)",
+                        options: [
+                            {text: "Mars", correct: false},
+                            {text: "Jupiter", correct: true},
+                            {text: "Venus", correct: false},
+                            {text: "Saturn", correct: true}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q7. What is the largest ocean on Earth?",
+                        options: [
+                            {text: "Atlantic Ocean", correct: false},
+                            {text: "Indian Ocean", correct: false},
+                            {text: "Arctic Ocean", correct: false},
+                            {text: "Pacific Ocean", correct: true}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q8. Which of these are mammals? (Select all that apply)",
+                        options: [
+                            {text: "Dolphin", correct: true},
+                            {text: "Shark", correct: false},
+                            {text: "Bat", correct: true},
+                            {text: "Frog", correct: false}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q9. What is the square root of 64?",
+                        options: [
+                            {text: "4", correct: false},
+                            {text: "6", correct: false},
+                            {text: "8", correct: true},
+                            {text: "10", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q10. Which countries are in Asia? (Select all that apply)",
+                        options: [
+                            {text: "Japan", correct: true},
+                            {text: "Brazil", correct: false},
+                            {text: "India", correct: true},
+                            {text: "Egypt", correct: false}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q11. Who wrote 'Romeo and Juliet'?",
+                        options: [
+                            {text: "Charles Dickens", correct: false},
+                            {text: "William Shakespeare", correct: true},
+                            {text: "Jane Austen", correct: false},
+                            {text: "Mark Twain", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q12. Which of these are primary colors? (Select all that apply)",
+                        options: [
+                            {text: "Red", correct: true},
+                            {text: "Green", correct: false},
+                            {text: "Blue", correct: true},
+                            {text: "Yellow", correct: true}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q13. What is the chemical formula for water?",
+                        options: [
+                            {text: "HO", correct: false},
+                            {text: "H2O", correct: true},
+                            {text: "H2O2", correct: false},
+                            {text: "H3O", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q14. Which of these are fruits? (Select all that apply)",
+                        options: [
+                            {text: "Tomato", correct: true},
+                            {text: "Carrot", correct: false},
+                            {text: "Apple", correct: true},
+                            {text: "Potato", correct: false}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q15. What is the capital of Japan?",
+                        options: [
+                            {text: "Beijing", correct: false},
+                            {text: "Seoul", correct: false},
+                            {text: "Tokyo", correct: true},
+                            {text: "Bangkok", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    }
+                ],
+                statuses: new Array(15).fill('pending'),
+                currentQuestion: 1
+            },
+            'B': {
+                questions: [
+                    {
+                        text: "Q1. What is the largest planet in our solar system?",
+                        options: [
+                            {text: "Earth", correct: false},
+                            {text: "Jupiter", correct: true},
+                            {text: "Saturn", correct: false},
+                            {text: "Neptune", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q2. Which of these are noble gases? (Select all that apply)",
+                        options: [
+                            {text: "Helium", correct: true},
+                            {text: "Oxygen", correct: false},
+                            {text: "Neon", correct: true},
+                            {text: "Carbon", correct: false}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q3. Who discovered penicillin?",
+                        options: [
+                            {text: "Marie Curie", correct: false},
+                            {text: "Alexander Fleming", correct: true},
+                            {text: "Albert Einstein", correct: false},
+                            {text: "Isaac Newton", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q4. Which of these are even numbers? (Select all that apply)",
+                        options: [
+                            {text: "2", correct: true},
+                            {text: "5", correct: false},
+                            {text: "8", correct: true},
+                            {text: "11", correct: false}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q5. What is the currency of the United Kingdom?",
+                        options: [
+                            {text: "Euro", correct: false},
+                            {text: "Dollar", correct: false},
+                            {text: "Pound", correct: true},
+                            {text: "Yen", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q6. Which of these are continents? (Select all that apply)",
+                        options: [
+                            {text: "Asia", correct: true},
+                            {text: "Europe", correct: true},
+                            {text: "India", correct: false},
+                            {text: "Antarctica", correct: true}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q7. What is the capital of Australia?",
+                        options: [
+                            {text: "Sydney", correct: false},
+                            {text: "Melbourne", correct: false},
+                            {text: "Canberra", correct: true},
+                            {text: "Perth", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q8. Which of these are programming paradigms? (Select all that apply)",
+                        options: [
+                            {text: "Object-oriented", correct: true},
+                            {text: "Functional", correct: true},
+                            {text: "Relational", correct: false},
+                            {text: "Procedural", correct: true}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q9. Who is known as the father of computers?",
+                        options: [
+                            {text: "Bill Gates", correct: false},
+                            {text: "Steve Jobs", correct: false},
+                            {text: "Charles Babbage", correct: true},
+                            {text: "Alan Turing", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q10. Which of these are search engines? (Select all that apply)",
+                        options: [
+                            {text: "Google", correct: true},
+                            {text: "Facebook", correct: false},
+                            {text: "Bing", correct: true},
+                            {text: "Twitter", correct: false}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q11. What is the chemical symbol for Sodium?",
+                        options: [
+                            {text: "So", correct: false},
+                            {text: "Na", correct: true},
+                            {text: "Sd", correct: false},
+                            {text: "Nm", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q12. Which of these are database systems? (Select all that apply)",
+                        options: [
+                            {text: "MySQL", correct: true},
+                            {text: "MongoDB", correct: true},
+                            {text: "Excel", correct: false},
+                            {text: "PostgreSQL", correct: true}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q13. Who wrote 'The Theory of Relativity'?",
+                        options: [
+                            {text: "Isaac Newton", correct: false},
+                            {text: "Albert Einstein", correct: true},
+                            {text: "Stephen Hawking", correct: false},
+                            {text: "Galileo Galilei", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q14. Which of these are web browsers? (Select all that apply)",
+                        options: [
+                            {text: "Chrome", correct: true},
+                            {text: "Firefox", correct: true},
+                            {text: "Photoshop", correct: false},
+                            {text: "Edge", correct: true}
+                        ],
+                        type: "multiple",
+                        status: "pending",
+                        remark: ""
+                    },
+                    {
+                        text: "Q15. What is the capital of Canada?",
+                        options: [
+                            {text: "Toronto", correct: false},
+                            {text: "Ottawa", correct: true},
+                            {text: "Vancouver", correct: false},
+                            {text: "Montreal", correct: false}
+                        ],
+                        type: "single",
+                        status: "pending",
+                        remark: ""
+                    }
+                ],
+                statuses: new Array(15).fill('pending'),
+                currentQuestion: 1
+            }
+        };
+
+        // Initialize variables
+        let currentQuestion = 1;
+        let currentSection = 'A';
+
+        // DOM elements
+        const questionText = document.getElementById('questionText');
+        const optionsList = document.getElementById('optionsList');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const questionGrid = document.getElementById('questionGrid');
+        const nextButton = document.getElementById('nextButton');
+        const approvedRadio = document.getElementById('approvedRadio');
+        const rejectedRadio = document.getElementById('rejectedRadio');
+        const remarkBox = document.getElementById('remarkBox');
+
+        // Initialize the dashboard
+        function initDashboard() {
+            initializeQuestionGrid();
+            updateUI();
+            setupEventListeners();
+        }
+
+        function initializeQuestionGrid() {
+            questionGrid.innerHTML = '';
+            for (let i = 1; i <= 15; i++) {
+                const button = document.createElement('button');
+                button.className = 'question-btn pending';
+                button.textContent = `Q${i}`;
+                button.onclick = () => {
+                    loadQuestion(i);
+                    updateUI();
+                };
+                questionGrid.appendChild(button);
+            }
+        }
+
+        function updateUI() {
+            const currentQ = sectionData[currentSection].questions[currentQuestion - 1];
+            
+            // Update question text
+            questionText.textContent = currentQ.text;
+            
+            // Update options
+            optionsList.innerHTML = '';
+            currentQ.options.forEach(option => {
+                const optionItem = document.createElement('div');
+                optionItem.className = `option-item ${option.correct ? 'correct-answer' : ''} ${currentQ.type === 'multiple' ? 'multiple-correct' : ''}`;
+                optionItem.innerHTML = `
+                    <span>${option.text}</span>
+                    ${option.correct ? '<span class="correct-tick">✓ Correct</span>' : ''}
+                `;
+                optionsList.appendChild(optionItem);
+            });
+            
+            // Update status indicator
+            updateStatusIndicator(currentQ.status);
+            
+            // Update approval controls
+            approvedRadio.checked = currentQ.status === 'approved';
+            rejectedRadio.checked = currentQ.status === 'rejected';
+            remarkBox.value = currentQ.remark || '';
+            remarkBox.style.display = rejectedRadio.checked ? 'block' : 'none';
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+            
+            // Update question grid
+            updateQuestionStatus(currentQuestion);
+        }
+
+        function updateStatusIndicator(status) {
+            statusIndicator.className = `status-indicator ${
+                status === 'approved' ? 'verified-correct' :
+                status === 'rejected' ? 'needs-correction' : 'pending-review'
+            }`;
+            statusIndicator.textContent = 
+                status === 'approved' ? 'Question Approved' :
+                status === 'rejected' ? 'Needs Correction' : 'Pending Review';
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.querySelector('.nav-btn:first-child');
+            prevBtn.disabled = currentQuestion === 1;
+            
+            if (currentSection === 'A' && currentQuestion === 15) {
+                nextButton.textContent = 'Go to Section B';
+            } else if (currentSection === 'B' && currentQuestion === 15) {
+                nextButton.textContent = 'Final Submit';
+            } else {
+                nextButton.textContent = 'Next Question';
+            }
+        }
+
+        function updateQuestionStatus(questionNum) {
+            const buttons = document.querySelectorAll('.question-grid button');
+            const status = sectionData[currentSection].questions[questionNum - 1].status;
+            
+            buttons[questionNum - 1].className = `question-btn ${
+                status === 'approved' ? 'approved' :
+                status === 'rejected' ? 'rejected' : 'pending'
+            }`;
+        }
+
+        function updateSummary() {
+            let approved = 0, rejected = 0, pending = 0;
+            
+            Object.values(sectionData).forEach(section => {
+                section.questions.forEach(question => {
+                    if (question.status === 'approved') approved++;
+                    else if (question.status === 'rejected') rejected++;
+                    else pending++;
+                });
+            });
+            
+            document.getElementById('approvedCount').textContent = approved;
+            document.getElementById('rejectedCount').textContent = rejected;
+            document.getElementById('pendingCount').textContent = pending;
+        }
+
+        function loadQuestion(questionNum) {
+            currentQuestion = questionNum;
+            sectionData[currentSection].currentQuestion = questionNum;
+        }
+
+        function switchSection(section) {
+            // Save current status before switching
+            saveCurrentStatus();
+            
+            // Switch to new section
+            currentSection = section;
+            currentQuestion = 1;
+            
+            // Update UI elements
+            document.querySelector('.section-title').textContent = `SECTION ${section}`;
+            document.querySelector('.section-header').textContent = `SECTION ${section}`;
+            
+            // Update section buttons
+            document.querySelectorAll('.section-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.includes(section));
+            });
+            
+            // Reinitialize question grid for new section
+            initializeQuestionGrid();
+            updateUI();
+        }
+
+        function nextQuestion() {
+            saveCurrentStatus();
+            
+            if (currentSection === 'A' && currentQuestion === 15) {
+                switchSection('B');
+            } else if (currentSection === 'B' && currentQuestion === 15) {
+                // Handle final submission
+                alert('All questions reviewed!');
+            } else if (currentQuestion < 15) {
+                currentQuestion++;
+                updateUI();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 1) {
+                currentQuestion--;
+                updateUI();
+            }
+        }
+
+        function saveCurrentStatus() {
+            const currentQ = sectionData[currentSection].questions[currentQuestion - 1];
+            
+            if (approvedRadio.checked) {
+                currentQ.status = 'approved';
+                currentQ.remark = '';
+            } else if (rejectedRadio.checked) {
+                currentQ.status = 'rejected';
+                currentQ.remark = remarkBox.value;
+            }
+            
+            updateQuestionStatus(currentQuestion);
+            updateSummary();
+        }
+
+        function setupEventListeners() {
+            approvedRadio.addEventListener('change', () => {
+                if (approvedRadio.checked) {
+                    remarkBox.style.display = 'none';
+                }
+                saveCurrentStatus();
+            });
+            
+            rejectedRadio.addEventListener('change', () => {
+                if (rejectedRadio.checked) {
+                    remarkBox.style.display = 'block';
+                }
+                saveCurrentStatus();
+            });
+            
+            remarkBox.addEventListener('input', function() {
+                const currentQ = sectionData[currentSection].questions[currentQuestion - 1];
+                if (currentQ.status === 'rejected') {
+                    currentQ.remark = this.value;
+                }
+            });
+        }
+
+        // Initialize the dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

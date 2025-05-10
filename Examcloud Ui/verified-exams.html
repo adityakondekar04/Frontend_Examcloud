@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verified Exams</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --secondary-color: #f8f9fa;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --error-color: #dc3545;
+            --success-color: #28a745;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .exam-title {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .exam-info {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .options-list {
+            list-style: none;
+            margin-left: 20px;
+        }
+
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: var(--secondary-color);
+        }
+
+        .correct-option {
+            background-color: #d4edda;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-verified {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Verified Exams</h1>
+            <a href="checker-dashboard.html" class="back-btn">Back to Dashboard</a>
+        </div>
+
+        <div class="exam-info">
+            <h2 class="exam-title">Chemistry Exam</h2>
+            <p>Duration: 75 minutes</p>
+            <p>Total Questions: 30</p>
+            <p>Created by: John Doe</p>
+            <p>Verified by: Jane Smith</p>
+        </div>
+
+        <div class="question-card">
+            <div class="question-text">
+                What is the chemical symbol for gold?
+                <span class="status-badge status-verified">Verified</span>
+            </div>
+            <ul class="options-list">
+                <li class="option">A. Ag</li>
+                <li class="option correct-option">B. Au</li>
+                <li class="option">C. Fe</li>
+                <li class="option">D. Cu</li>
+            </ul>
+        </div>
+
+        <div class="question-card">
+            <div class="question-text">
+                Which of the following is a noble gas?
+                <span class="status-badge status-verified">Verified</span>
+            </div>
+            <ul class="options-list">
+                <li class="option">A. Chlorine</li>
+                <li class="option">B. Oxygen</li>
+                <li class="option correct-option">C. Helium</li>
+                <li class="option">D. Nitrogen</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html> 
